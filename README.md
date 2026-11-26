@@ -6,7 +6,7 @@ Send each question to the cheapest model that can answer it, and skip the model 
 
 On a 40-question test set, routing by explainable rules kept the accuracy of always using the large model (**100%**) at **58% lower cost**. A semantic cache in front answered **14 of 15** reworded questions without calling any model and was **never fooled by changed numbers (0 of 5)**.
 
-On 250 held-out problems of the public **GSM8K** maths benchmark, **self-consistency routing matched the large model's accuracy (96.4%) at 51% lower cost**, and a **learned router** (logistic regression on question embeddings) reached 95.6% at 58% lower cost, against 80.1% for a random router sending the same share to the large model.
+On 250 held-out problems of the public **GSM8K** maths benchmark, **self-consistency routing matched the large model's accuracy (96.4%) at 51% lower cost**, and sending only the small model's empty replies to the large model reached 95.6% at 58% lower cost. A correction found on re-analysis (2026-11-26): the learned router's result in the first version of this section came almost entirely from that empty-reply fallback, not from learning (details below).
 
 ## How it works
 
@@ -80,14 +80,15 @@ The 40 questions above are mine, so a router could be tuned to them by accident.
 | Rules | 96.4% | 94.8% | $5,546 (−3%) |
 | Cascade | 95.6% | 54.8% | $4,398 (−23%) |
 | **Consistency** | **96.4%** | **26.0%** | **$2,819 (−51%)** |
-| **Learned** | **95.6%** | **24.4%** | **$2,429 (−58%)** |
-| Random router, same share as learned | 80.1% | 24.4% | $1,746 |
+| Learned (see the correction below) | 95.6% | 24.4% | $2,429 (−58%) |
+| Empty-reply fallback only, no routing decision | 95.6% | 23.2% | $2,392 (−58%) |
+| Random router, same share as learned, no fallback | 80.1% | 24.4% | $1,746 |
 | Oracle (knows which model is right) | 96.8% | 25.2% | $2,282 (−60%) |
 
 What the numbers mean, honestly:
 
 - On hard problems the small model is right only 74.8% of the time, so routing matters here. **Consistency is the safe choice**: no accuracy lost, half the cost. When the small model gives the same answer twice, it is usually right.
-- **The learned router beats chance by 15.5 points** at the same share of large-model calls, and it is the cheapest option within one point of the large model. It is close to the oracle's share (24.4% against 25.2%), but it still sends some wrong questions: it loses 0.8 points.
+- **Correction (2026-11-26, found by re-reading the stored replies): the learned router did not learn much.** 58 of the 250 small-model answers were empty: Gemma 4 thought until its 2,048-token budget ran out. Every strategy sends an empty reply to the large model, and that fallback alone gives 95.6% at 23.2% large share. The trained model added 3 escalations and no accuracy. The random router I compared against had no fallback, so "15.5 points better than random", which this section said first, measured the fallback, not the model. As a signal for "the small model is wrong", the learned probability scores AUROC 0.67, close to the simple rules count (0.65); the disagreement of two small-model samples scores 0.76. The next measurement turns thinking off for the small model, uses the cleaned GSM8K-Platinum labels, and reports a fallback-only control and signal AUROCs next to every strategy.
 - **Rules do not work on this set**: almost every GSM8K problem is long, has three or more numbers and uses words like "each", so 94.8% go to the large model. Rules fit mixed traffic, not uniform word problems.
 - **Cascade escalated more here (54.8%) but still lost 0.8 points**: a small model's own "I am unsure" is a weak signal.
 - The threshold picked on the training half is 0.01, which means the trained model is very confident (250 examples, 768 features). The sweep in the report shows thresholds 0.5 to 0.9 reach 96.0% to 96.4% at 44% to 60% large-model share; more training data should give calmer probabilities.
