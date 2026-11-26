@@ -1,0 +1,77 @@
+{
+  "models": {
+    "small": "gemma4:12b",
+    "large": "qwen3.8:27b",
+    "embed": "embeddinggemma2-bf16"
+  },
+  "small": {
+    "accuracy": 0.748,
+    "large_share": 0.0,
+    "usd_per_million": 463.81
+  },
+  "large": {
+    "accuracy": 0.964,
+    "large_share": 1.0,
+    "usd_per_million": 5718.54
+  },
+  "n_train": 250,
+  "n_test": 250,
+  "threshold": 0.01,
+  "rules": {
+    "accuracy": 0.964,
+    "large_share": 0.948,
+    "usd_per_million": 5545.59
+  },
+  "cascade": {
+    "accuracy": 0.956,
+    "large_share": 0.548,
+    "usd_per_million": 4397.94
+  },
+  "consistency": {
+    "accuracy": 0.964,
+    "large_share": 0.26,
+    "usd_per_million": 2818.87
+  },
+  "learned": {
+    "accuracy": 0.956,
+    "large_share": 0.244,
+    "usd_per_million": 2428.85
+  },
+  "learned_sweep": {
+    "0.5": {
+      "accuracy": 0.96,
+      "large_share": 0.436,
+      "usd_per_million": 3205.97
+    },
+    "0.6": {
+      "accuracy": 0.96,
+      "large_share": 0.464,
+      "usd_per_million": 3330.39
+    },
+    "0.7": {
+      "accuracy": 0.96,
+      "large_share": 0.504,
+      "usd_per_million": 3487.29
+    },
+    "0.8": {
+      "accuracy": 0.96,
+      "large_share": 0.544,
+      "usd_per_million": 3739.21
+    },
+    "0.9": {
+      "accuracy": 0.964,
+      "large_share": 0.604,
+      "usd_per_million": 4001.06
+    }
+  },
+  "random_same_share": {
+    "accuracy": 0.8007,
+    "large_share": 0.244,
+    "usd_per_million": 1745.96
+  },
+  "oracle": {
+    "accuracy": 0.968,
+    "large_share": 0.252,
+    "usd_per_million": 2281.81
+  }
+}

@@ -194,7 +194,12 @@ def main() -> None:
     if a.weights:
         model.save(a.weights)
     threshold = pick_threshold(model, train, store, prices)
-    report = {"small": a.small, "large": a.large, "n_train": len(train), "n_test": len(test), "threshold": threshold}
+    report = {
+        "models": {"small": a.small, "large": a.large, "embed": a.embed},
+        "n_train": len(train),
+        "n_test": len(test),
+        "threshold": threshold,
+    }
     for s in ("small", "large", "rules", "cascade", "consistency"):
         report[s] = score(s, test, store, prices)
     report["learned"] = score("learned", test, store, prices, model=model, threshold=threshold)
