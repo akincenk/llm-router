@@ -8,3 +8,5 @@ __pycache__/
 dist/
 build/
 .DS_Store
+evals/data/
+evals/gsm8k-replies.json
