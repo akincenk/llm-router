@@ -29,9 +29,9 @@ class Client:
         with urllib.request.urlopen(req, timeout=self.timeout) as r:
             return json.load(r)
 
-    def chat(self, model: str, messages: list[dict], max_tokens: int = 2048) -> Completion:
+    def chat(self, model: str, messages: list[dict], max_tokens: int = 2048, temperature: float = 0) -> Completion:
         start = time.monotonic()
-        body = {"model": model, "messages": messages, "temperature": 0, "max_tokens": max_tokens}
+        body = {"model": model, "messages": messages, "temperature": temperature, "max_tokens": max_tokens}
         data = self._post("/chat/completions", body)
         usage = data.get("usage") or {}
         return Completion(

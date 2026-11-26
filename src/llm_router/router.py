@@ -4,7 +4,11 @@ Strategies:
 - "small" / "large": always one model (baselines).
 - "rules": an explainable difficulty score decides (length, numbers, reasoning cues, several questions, code).
 - "cascade": the small model answers first and may reply ESCALATE; then the large model answers.
-- In "rules" and "cascade", an empty reply from the small model also goes to the large model.
+- "learned": a model trained on past answers predicts from the question's embedding whether the small model will
+  be right (see learned.py); below the threshold the question goes to the large model.
+- "consistency": the small model answers twice (the second time sampled); if the two final answers differ, the
+  large model answers instead. Disagreement is a cheap sign of uncertainty that needs no training.
+- In every strategy except the baselines, an empty reply from the small model also goes to the large model.
 Any strategy can sit behind a SemanticCache.
 """
 
@@ -17,6 +21,8 @@ from llm_router.client import Completion
 
 SYSTEM = "Answer correctly and briefly. Give the final answer in the last line."
 ESCALATE = "ESCALATE"
+STRATEGIES = ("small", "large", "rules", "cascade", "learned", "consistency")
+SAMPLE_TEMPERATURE = 0.8
 CASCADE_NOTE = f" If you are not sure your answer is correct, reply with exactly {ESCALATE} and nothing else."
 CUES = (
     "why",
@@ -57,6 +63,17 @@ def difficulty(question: str) -> tuple[bool, list[str]]:
     return len(reasons) >= 2, reasons
 
 
+def final_answer(text: str) -> str:
+    """The last number of the last non-empty line (commas removed), else that line in lower case."""
+    lines = [line for line in text.splitlines() if line.strip()]
+    last = lines[-1].replace(",", "") if lines else ""
+    nums = re.findall(r"-?\d+(?:\.\d+)?", last)
+    if nums:
+        v = float(nums[-1])
+        return str(int(v)) if v.is_integer() else str(v)
+    return last.strip().lower()
+
+
 @dataclass
 class Answer:
     text: str
@@ -76,31 +93,57 @@ class Router:
         large: str,
         strategy: str = "rules",
         cache: SemanticCache | None = None,
+        predictor: Callable[[str], float] | None = None,
+        threshold: float = 0.5,
     ):
-        if strategy not in ("small", "large", "rules", "cascade"):
-            raise ValueError("strategy must be small, large, rules or cascade")
+        if strategy not in STRATEGIES:
+            raise ValueError(f"strategy must be one of {', '.join(STRATEGIES)}")
+        if strategy == "learned" and predictor is None:
+            raise ValueError("the learned strategy needs a predictor")
         self.chat, self.small, self.large, self.strategy, self.cache = chat, small, large, strategy, cache
+        self.predictor, self.threshold = predictor, threshold
 
-    def _ask(self, model: str, question: str, note: str = "") -> Completion:
-        return self.chat(model, [{"role": "system", "content": SYSTEM + note}, {"role": "user", "content": question}])
+    def _ask(self, model: str, question: str, note: str = "", temperature: float = 0) -> Completion:
+        messages = [{"role": "system", "content": SYSTEM + note}, {"role": "user", "content": question}]
+        return self.chat(model, messages, **({"temperature": temperature} if temperature else {}))
+
+    def _route(self, question: str) -> tuple[bool, list[str]]:
+        if self.strategy == "learned":
+            p = self.predictor(question)
+            return p < self.threshold, [f"p(small right)={p:.2f}"]
+        return difficulty(question)
 
     def ask(self, question: str) -> Answer:
         if self.cache is not None and (hit := self.cache.get(question)):
             return Answer(hit[0], "cache", reasons=[f"cache similarity {hit[1]:.3f}"])
-        hard, reasons = difficulty(question)
-        if self.strategy == "large" or (self.strategy == "rules" and hard):
+        hard, reasons = self._route(question)
+        if self.strategy == "large" or (self.strategy in ("rules", "learned") and hard):
             c = self._ask(self.large, question)
             ans = Answer(c.text, self.large, c.seconds, tokens_large=c.tokens, reasons=reasons)
         elif self.strategy == "small":
             c = self._ask(self.small, question)
             ans = Answer(c.text, self.small, c.seconds, tokens_small=c.tokens, reasons=reasons)
-        else:  # rules (easy question) or cascade: the small model first, the large one if it gives up
+        else:  # an easy question, cascade or consistency: the small model first, the large one if in doubt
             first = self._ask(self.small, question, CASCADE_NOTE if self.strategy == "cascade" else "")
             text = first.text.strip()
+            disagree = False
+            if self.strategy == "consistency" and text:
+                sample = self._ask(self.small, question, temperature=SAMPLE_TEMPERATURE)
+                first = Completion(
+                    text,
+                    first.tokens + sample.tokens,
+                    first.seconds + sample.seconds,
+                    first.tokens_in + sample.tokens_in,
+                    first.tokens_out + sample.tokens_out,
+                )
+                disagree = final_answer(sample.text) != final_answer(text)
             # An empty reply (for example a thinking model that used its whole token budget) also escalates.
-            if not text or text.upper().startswith(ESCALATE):
+            if not text or text.upper().startswith(ESCALATE) or disagree:
                 second = self._ask(self.large, question)
-                why = "small model escalated" if text else "small model gave no answer"
+                if disagree:
+                    why = "small model disagreed with itself"
+                else:
+                    why = "small model escalated" if text else "small model gave no answer"
                 ans = Answer(
                     second.text, self.large, first.seconds + second.seconds, first.tokens, second.tokens, True, [why]
                 )

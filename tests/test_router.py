@@ -113,3 +113,49 @@ def test_client_parses_chat_and_embeddings():
         c = Client("http://127.0.0.1:11434/v1")
         assert c.chat("m", []).text == "Ottawa"
         assert c.embed("e", ["a", "b"]) == [[0.1], [0.2]]
+
+
+def test_final_answer_reads_the_last_number_of_the_last_line():
+    from llm_router.router import final_answer
+
+    assert final_answer("Work: 12 * 3 = 36\nThe answer is 1,240.") == "1240"
+    assert final_answer("so 7.50\n\n7.5") == "7.5"
+    assert final_answer("x\n42.0") == "42"
+    assert final_answer("Paris") == "paris"
+
+
+class SampledChat:
+    """The small model's sampled reply can differ from its first one."""
+
+    def __init__(self, first, sampled):
+        self.calls, self.first, self.sampled = [], first, sampled
+
+    def __call__(self, model, messages, temperature=0):
+        self.calls.append((model, temperature))
+        if model == "large":
+            return Completion("large: 9", 100, 0.01, 60, 40)
+        return Completion(self.sampled if temperature else self.first, 10, 0.01, 6, 4)
+
+
+def test_consistency_keeps_the_small_answer_when_both_samples_agree():
+    chat = SampledChat("3 + 4\n7", "it is 7")
+    a = Router(chat, "small", "large", "consistency").ask("What is 3 + 4?")
+    assert a.model == "small" and a.text.endswith("7") and a.tokens_small == 20
+    assert chat.calls == [("small", 0), ("small", 0.8)]
+
+
+def test_consistency_escalates_when_the_small_model_disagrees_with_itself():
+    chat = SampledChat("7", "8")
+    a = Router(chat, "small", "large", "consistency").ask("What is 3 + 4?")
+    assert a.model == "large" and a.escalated and a.reasons == ["small model disagreed with itself"]
+    assert a.tokens_small == 20 and a.tokens_large == 100
+
+
+def test_learned_routes_by_predicted_chance_and_needs_a_predictor():
+    chat = FakeChat()
+    r = Router(chat, "small", "large", "learned", predictor=lambda q: 0.9 if "easy" in q else 0.2, threshold=0.5)
+    assert r.ask("an easy one").model == "small"
+    hard = r.ask("a hard one")
+    assert hard.model == "large" and hard.reasons == ["p(small right)=0.20"]
+    with pytest.raises(ValueError):
+        Router(chat, "small", "large", "learned")

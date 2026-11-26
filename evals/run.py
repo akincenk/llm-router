@@ -43,8 +43,8 @@ class PricedChat:
     def __init__(self, chat, prices: dict[str, tuple[float, float]]):
         self.chat, self.prices, self.usd = chat, prices, 0.0
 
-    def __call__(self, model: str, messages: list[dict]) -> Completion:
-        c = self.chat(model, messages)
+    def __call__(self, model: str, messages: list[dict], **kw) -> Completion:
+        c = self.chat(model, messages, **kw)
         p_in, p_out = self.prices[model]
         self.usd += (c.tokens_in * p_in + c.tokens_out * p_out) / 1e6
         return c
