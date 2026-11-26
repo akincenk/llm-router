@@ -23,9 +23,11 @@ Usage:
 
 import argparse
 import json
+import math
 import os
 import random
 import urllib.request
+from collections import Counter
 from pathlib import Path
 
 from llm_router.client import Client
@@ -149,6 +151,8 @@ def simulate(strategy: str, item: dict, rec: dict, prices: dict, model=None, thr
         return use_large()
     if strategy == "small":
         return use_small(small)
+    if strategy == "fallback":  # control: only the empty-reply fallback, no routing decision at all
+        return use_large(small) if not small["text"].strip() else use_small(small)
     if strategy == "cascade":
         text = rec["cascade"]["text"].strip()
         return use_large(rec["cascade"]) if not text or text.upper().startswith(ESCALATE) else use_small(rec["cascade"])
@@ -158,6 +162,19 @@ def simulate(strategy: str, item: dict, rec: dict, prices: dict, model=None, thr
         if final_answer(rec["sample"]["text"]) != final_answer(small["text"]):
             return use_large(small, rec["sample"])
         return use_small(small, rec["sample"])
+    if strategy in ("consistency3", "majority3"):
+        texts = [small, rec["sample"], rec["sample2"]]
+        if not small["text"].strip():
+            return use_large(small)
+        votes = Counter(final_answer(r["text"]) for r in texts if r["text"].strip())
+        top, n = votes.most_common(1)[0]
+        if n == 3 or (strategy == "majority3" and n == 2):
+            return {"ok": top == item["answer"], "usd": sum(cost(r, prices["small"]) for r in texts), "large": False}
+        return use_large(*texts)
+    if strategy == "learned_consistency":  # the learned router first; questions it calls easy get the consistency check
+        if model.prob(rec["embedding"]) < threshold:
+            return use_large()
+        return simulate("consistency", item, rec, prices)
     hard = difficulty(item["q"])[0] if strategy == "rules" else model.prob(rec["embedding"]) < threshold
     if hard:
         return use_large()
@@ -202,14 +219,95 @@ def references(items: list[dict], store: dict, prices: dict, share: float) -> di
     }
 
 
-def pick_threshold(model, train: list[dict], store: dict, prices: dict) -> float:
+def pick_threshold(model, train: list[dict], store: dict, prices: dict, strategy: str = "learned") -> float:
     target = score("large", train, store, prices)["accuracy"] - 0.01
     best = 1.0  # threshold 1.0 sends everything to the large model
     for t in [i / 100 for i in range(1, 100)]:
-        s = score("learned", train, store, prices, model=model, threshold=t)
+        s = score(strategy, train, store, prices, model=model, threshold=t)
         if s["accuracy"] >= target and t < best:
             best = t
     return best
+
+
+def auroc(scores: list[float], labels: list[bool]) -> float | None:
+    """Chance that a random positive scores higher than a random negative (ties count half)."""
+    pos = [s for s, y in zip(scores, labels, strict=True) if y]
+    neg = [s for s, y in zip(scores, labels, strict=True) if not y]
+    if not pos or not neg:
+        return None
+    wins = sum((p > n) + 0.5 * (p == n) for p in pos for n in neg)
+    return round(wins / (len(pos) * len(neg)), 4)
+
+
+def signals(items: list[dict], store: dict, model) -> dict:
+    """How well each escalation signal predicts two targets (arXiv 2610.07354 checklist): "small_wrong" and
+    "escalation_helps" (small wrong and large right). Question-only signals are the control: a live signal
+    that does not beat them only tracks how hard a question looks."""
+    small_ok = [correct(store[it["q"]]["small"]["text"], it) for it in items]
+    large_ok = [correct(store[it["q"]]["large"]["text"], it) for it in items]
+
+    def agree(rec):
+        texts = [rec[k]["text"] for k in ("small", "sample", "sample2") if k in rec and rec[k]["text"].strip()]
+        return Counter(map(final_answer, texts)).most_common(1)[0][1] if texts else 0
+
+    def cascade_flag(rec):
+        text = rec["cascade"]["text"].strip()
+        return float(not text or text.upper().startswith(ESCALATE))
+
+    sig = {
+        "question_only/rules_signal_count": [len(difficulty(it["q"])[1]) for it in items],
+        "question_only/learned_1_minus_p": [1 - model.prob(store[it["q"]]["embedding"]) for it in items],
+        "live/disagree_2_samples": [
+            float(final_answer(store[it["q"]]["small"]["text"]) != final_answer(store[it["q"]]["sample"]["text"]))
+            for it in items
+        ],
+        "live/cascade_escalate": [cascade_flag(store[it["q"]]) for it in items],
+    }
+    if all("sample2" in store[it["q"]] for it in items):
+        sig["live/disagreement_of_3"] = [3 - agree(store[it["q"]]) for it in items]
+    targets = {
+        "small_wrong": [not s for s in small_ok],
+        "escalation_helps": [(not s) and b for s, b in zip(small_ok, large_ok, strict=True)],
+    }
+    return {
+        "auroc": {name: {t: auroc(v, y) for t, y in targets.items()} for name, v in sig.items()},
+        "headroom_oracle_minus_large": round(
+            (sum(s or b for s, b in zip(small_ok, large_ok, strict=True)) - sum(large_ok)) / len(items), 4
+        ),
+        "positives": {t: sum(y) for t, y in targets.items()},
+    }
+
+
+def pick_l2(xs: list, ys: list[int], folds: int = 5, grid=(1.0, 10.0, 100.0, 1000.0, 10000.0)) -> float:
+    """L2 penalty with the lowest cross-validated log-loss on the training set (calmer probabilities)."""
+    best, best_loss = grid[0], math.inf
+    for l2 in grid:
+        loss = 0.0
+        for f in range(folds):
+            tr = [i for i in range(len(xs)) if i % folds != f]
+            m = fit([xs[i] for i in tr], [ys[i] for i in tr], l2=l2)
+            for i in range(f, len(xs), folds):
+                p = min(max(m.prob(xs[i]), 1e-6), 1 - 1e-6)
+                loss -= math.log(p if ys[i] else 1 - p)
+        if loss < best_loss:
+            best, best_loss = l2, loss
+    return best
+
+
+class OutOfFold:
+    """Out-of-fold probabilities for the training problems, so the threshold is not picked on predictions the
+    model made for its own training examples (those are overconfident: the first run picked 0.01)."""
+
+    def __init__(self, xs: list, ys: list[int], l2: float, folds: int = 5):
+        self.p = {}
+        for f in range(folds):
+            tr = [i for i in range(len(xs)) if i % folds != f]
+            m = fit([xs[i] for i in tr], [ys[i] for i in tr], l2=l2)
+            for i in range(f, len(xs), folds):
+                self.p[id(xs[i])] = m.prob(xs[i])
+
+    def prob(self, x: list[float]) -> float:
+        return self.p[id(x)]
 
 
 def main() -> None:
@@ -236,24 +334,32 @@ def main() -> None:
     client = Client(a.base_url, os.getenv("OPENAI_API_KEY", "local"), options=options)
     store = collect(client, train + test, a.small, a.large, a.embed, Path(a.cache))
     ys = [int(correct(store[it["q"]]["small"]["text"], it)) for it in train]
-    model = fit([store[it["q"]]["embedding"] for it in train], ys)
+    xs = [store[it["q"]]["embedding"] for it in train]
+    l2 = pick_l2(xs, ys)
+    model = fit(xs, ys, l2=l2)
     if a.weights:
         model.save(a.weights)
-    threshold = pick_threshold(model, train, store, prices)
+    oof = OutOfFold(xs, ys, l2)
+    threshold = pick_threshold(oof, train, store, prices)
     report = {
         "models": {"small": a.small, "large": a.large, "embed": a.embed, "options": options},
         "data": "train: GSM8K train file; test: GSM8K-Platinum",
         "n_train": len(train),
         "n_test": len(test),
         "threshold": threshold,
+        "l2": l2,
     }
-    for s in ("small", "large", "rules", "cascade", "consistency"):
+    for s in ("small", "large", "fallback", "rules", "cascade", "consistency", "consistency3", "majority3"):
         report[s] = score(s, test, store, prices)
+    t_lc = pick_threshold(oof, train, store, prices, "learned_consistency")
+    report["learned_consistency"] = score("learned_consistency", test, store, prices, model=model, threshold=t_lc)
+    report["learned_consistency"]["threshold"] = t_lc
     report["learned"] = score("learned", test, store, prices, model=model, threshold=threshold)
     report["learned_sweep"] = {
         str(t): score("learned", test, store, prices, model=model, threshold=t) for t in (0.5, 0.6, 0.7, 0.8, 0.9)
     }
     report.update(references(test, store, prices, report["learned"]["large_share"]))
+    report["signals"] = signals(test, store, model)
     print(json.dumps(report, indent=2))
     if a.json:
         Path(a.json).write_text(json.dumps(report, indent=2))

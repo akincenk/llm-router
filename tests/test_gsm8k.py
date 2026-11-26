@@ -44,3 +44,41 @@ def test_score_and_references():
     ref = references(items, store, PRICES, share=0.5)
     assert ref["oracle"] == {"accuracy": 1.0, "large_share": 0.5, "usd_per_million": 5.5e6}
     assert ref["random_same_share"]["accuracy"] == 0.75
+
+
+def rec3(small, s1, s2, large="9"):
+    out = rec(small, large=large, sample=s1)
+    out["sample2"] = r(s2)
+    return out
+
+
+def test_three_sample_strategies():
+    # all three agree: stay small, pay three small calls
+    assert simulate("consistency3", ITEM, rec3("9", "9", "9"), PRICES) == {"ok": True, "usd": 3.0, "large": False}
+    # two of three: consistency3 escalates, majority3 keeps the majority answer
+    assert simulate("consistency3", ITEM, rec3("8", "9", "9"), PRICES) == {"ok": True, "usd": 13.0, "large": True}
+    assert simulate("majority3", ITEM, rec3("8", "9", "9"), PRICES) == {"ok": True, "usd": 3.0, "large": False}
+    # no majority: escalate
+    assert simulate("majority3", ITEM, rec3("7", "8", "6"), PRICES)["large"]
+
+
+def test_learned_consistency_uses_the_cheap_check_only_on_easy_questions():
+    model = LogisticModel([0.0], 0.0, [0.0], [1.0])  # always 0.5
+    hard = simulate("learned_consistency", ITEM, rec("8", sample="7"), PRICES, model=model, threshold=0.6)
+    assert hard == {"ok": True, "usd": 10.0, "large": True}  # straight to large, no small calls paid
+    easy = simulate("learned_consistency", ITEM, rec("9", sample="9"), PRICES, model=model, threshold=0.4)
+    assert easy == {"ok": True, "usd": 2.0, "large": False}
+
+
+def test_auroc():
+    from evals.gsm8k import auroc
+
+    assert auroc([3, 2, 1, 0], [True, True, False, False]) == 1.0
+    assert auroc([0, 1], [True, False]) == 0.0
+    assert auroc([1, 1], [True, False]) == 0.5
+    assert auroc([1], [True]) is None
+
+
+def test_fallback_control_escalates_only_empty_replies():
+    assert simulate("fallback", ITEM, rec(""), PRICES) == {"ok": True, "usd": 11.0, "large": True}
+    assert simulate("fallback", ITEM, rec("8"), PRICES) == {"ok": False, "usd": 1.0, "large": False}
