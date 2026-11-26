@@ -1,20 +1,24 @@
 """Routing on a public benchmark: GSM8K grade-school maths word problems (OpenAI, MIT licence).
 
-The question set is not written by me, so the router cannot be tuned to it by accident. Method:
+The question set is not written by me, so the router cannot be tuned to it by accident. Method (second run):
 
-1. Sample N problems from the GSM8K test file with a fixed seed; the first half trains, the second half tests.
-2. Ask every problem once to the small model, once to the large model, once to the small model with the cascade
-   note (it may say ESCALATE) and once more to the small model sampled at temperature 0.8 (for consistency).
-   Every reply is stored, so a crashed run resumes where it stopped.
-3. Embed every problem; train the learned router on the training half (label: was the small model right?).
-4. Simulate every strategy on the test half from the stored replies. A decision that depends only on the
-   question (rules, learned) needs no new model call, so the learned router can be swept over thresholds.
-   The threshold reported is picked on the training half: the cheapest one whose training accuracy stays within
-   one point of the large model's. Two references bracket the result: a random router that sends the same share
-   to the large model, and an oracle that knows which model is right.
+1. Train problems come from the GSM8K train file; test problems are GSM8K-Platinum (MadryLab, MIT): the GSM8K
+   test set with mislabeled answers fixed and ambiguous questions removed (1,209 of 1,319 kept). Train and test
+   never share a problem.
+2. Ask every problem to the small model, the large model, the small model with the cascade note (it may say
+   ESCALATE) and twice more to the small model sampled at temperature 0.8 (for consistency). The small model runs
+   with reasoning_effort "none": with thinking on, Gemma 4 sometimes thinks until any token budget runs out and
+   returns nothing. Every reply is stored, so a crashed run resumes where it stopped.
+3. Embed every problem; train the learned router on the train problems (label: was the small model right?).
+4. Simulate every strategy on the test problems from the stored replies, and pick every setting on train only.
+   Two references bracket the result: a random router that sends the same share to the large model, and an
+   oracle that knows which model is right.
+
+The first run (2026-11-26, commit 67c5021, load_v1): 500 problems from the original test file, halves for train
+and test, small model thinking with a 2,048-token cap. Its report stays in evals/results-gsm8k.json.
 
 Usage:
-  python -m evals.gsm8k --n 500 --cache evals/gsm8k-replies.json --json evals/results-gsm8k.json
+  python -m evals.gsm8k --train 500 --cache evals/gsm8k-v2-replies.json --json evals/results-gsm8k-v2.json
 """
 
 import argparse
@@ -28,18 +32,57 @@ from llm_router.client import Client
 from llm_router.learned import fit
 from llm_router.router import CASCADE_NOTE, ESCALATE, SAMPLE_TEMPERATURE, SYSTEM, difficulty, final_answer
 
-URL = "https://raw.githubusercontent.com/openai/grade-school-math/master/grade_school_math/data/test.jsonl"
-DATA = Path(__file__).parent / "data" / "gsm8k-test.jsonl"
+BASE = "https://raw.githubusercontent.com/openai/grade-school-math/master/grade_school_math/data/"
+PLATINUM = (
+    "https://datasets-server.huggingface.co/rows?dataset=madrylab%2Fgsm8k-platinum&config=main&split=test"
+    "&offset={}&length=100"
+)
+DATA = Path(__file__).parent / "data"
 
 
-def load(n: int, seed: int = 0) -> list[dict]:
-    if not DATA.exists():
-        DATA.parent.mkdir(parents=True, exist_ok=True)
-        with urllib.request.urlopen(URL, timeout=60) as r:
-            DATA.write_bytes(r.read())
-    rows = [json.loads(line) for line in DATA.read_text().splitlines() if line.strip()]
-    items = [{"q": r["question"], "answer": gold(r["answer"])} for r in rows]
-    return random.Random(seed).sample(items, n)
+def _rows(name: str, download) -> list[dict]:
+    path = DATA / name
+    if not path.exists():
+        DATA.mkdir(parents=True, exist_ok=True)
+        path.write_text("".join(json.dumps(r) + "\n" for r in download()))
+    return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+
+
+def _get(url: str) -> bytes:
+    with urllib.request.urlopen(url, timeout=60) as r:
+        return r.read()
+
+
+def _platinum() -> list[dict]:
+    rows, total = [], None
+    while total is None or len(rows) < total:
+        page = json.loads(_get(PLATINUM.format(len(rows))))
+        total = page["num_rows_total"]
+        if not page["rows"]:
+            break
+        rows += [r["row"] for r in page["rows"]]
+    if len(rows) != total:
+        raise RuntimeError(f"GSM8K-Platinum: got {len(rows)} of {total} rows")
+    return rows
+
+
+def _items(rows: list[dict]) -> list[dict]:
+    return [{"q": r["question"], "answer": gold(r["answer"])} for r in rows]
+
+
+def load_v1(n: int, seed: int = 0) -> list[dict]:
+    """The first measurement (2026-11-26, commit 67c5021): n problems sampled from the original GSM8K test file."""
+    rows = _rows("gsm8k-test.jsonl", lambda: [json.loads(x) for x in _get(BASE + "test.jsonl").splitlines() if x])
+    return random.Random(seed).sample(_items(rows), n)
+
+
+def load(n_train: int, n_test: int | None, seed: int = 0) -> tuple[list[dict], list[dict]]:
+    """Train on problems from the GSM8K train file; test on GSM8K-Platinum (MIT, MadryLab 2025), the GSM8K test
+    set with wrong labels fixed and ambiguous questions removed. n_test None means all 1,209."""
+    train = _rows("gsm8k-train.jsonl", lambda: [json.loads(x) for x in _get(BASE + "train.jsonl").splitlines() if x])
+    test = _items(_rows("gsm8k-platinum-test.jsonl", _platinum))
+    rng = random.Random(seed)
+    return rng.sample(_items(train), n_train), (test if n_test is None else rng.sample(test, n_test))
 
 
 def gold(solution: str) -> str:
@@ -58,6 +101,7 @@ def collect(client: Client, items: list[dict], small: str, large: str, embed: st
         "large": (large, "", 0),
         "cascade": (small, CASCADE_NOTE, 0),
         "sample": (small, "", SAMPLE_TEMPERATURE),
+        "sample2": (small, "", SAMPLE_TEMPERATURE),
     }
     for i, item in enumerate(items):
         rec = store.setdefault(item["q"], {})
@@ -174,8 +218,10 @@ def main() -> None:
     p.add_argument("--small", default="gemma4:12b")
     p.add_argument("--large", default="qwen3.8:27b")
     p.add_argument("--embed", default="embeddinggemma2-bf16")
-    p.add_argument("--n", type=int, default=500)
-    p.add_argument("--cache", default="evals/gsm8k-replies.json")
+    p.add_argument("--train", type=int, default=500, help="problems from the GSM8K train file")
+    p.add_argument("--test", type=int, help="problems from GSM8K-Platinum (default: all 1,209)")
+    p.add_argument("--small-reasoning", default="none", help="reasoning_effort for the small model ('' = default)")
+    p.add_argument("--cache", default="evals/gsm8k-v2-replies.json")
     p.add_argument("--price-small", default="0.10,0.50", help="dollars per million tokens: input,output")
     p.add_argument("--price-large", default="4,20", help="dollars per million tokens: input,output")
     p.add_argument("--weights", help="also save the trained router here")
@@ -185,17 +231,18 @@ def main() -> None:
         "small": tuple(map(float, a.price_small.split(","))),
         "large": tuple(map(float, a.price_large.split(","))),
     }
-    items = load(a.n)
-    train, test = items[: a.n // 2], items[a.n // 2 :]
-    client = Client(a.base_url, os.getenv("OPENAI_API_KEY", "local"))
-    store = collect(client, items, a.small, a.large, a.embed, Path(a.cache))
+    train, test = load(a.train, a.test)
+    options = {a.small: {"reasoning_effort": a.small_reasoning}} if a.small_reasoning else {}
+    client = Client(a.base_url, os.getenv("OPENAI_API_KEY", "local"), options=options)
+    store = collect(client, train + test, a.small, a.large, a.embed, Path(a.cache))
     ys = [int(correct(store[it["q"]]["small"]["text"], it)) for it in train]
     model = fit([store[it["q"]]["embedding"] for it in train], ys)
     if a.weights:
         model.save(a.weights)
     threshold = pick_threshold(model, train, store, prices)
     report = {
-        "models": {"small": a.small, "large": a.large, "embed": a.embed},
+        "models": {"small": a.small, "large": a.large, "embed": a.embed, "options": options},
+        "data": "train: GSM8K train file; test: GSM8K-Platinum",
         "n_train": len(train),
         "n_test": len(test),
         "threshold": threshold,

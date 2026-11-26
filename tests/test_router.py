@@ -159,3 +159,26 @@ def test_learned_routes_by_predicted_chance_and_needs_a_predictor():
     assert hard.model == "large" and hard.reasons == ["p(small right)=0.20"]
     with pytest.raises(ValueError):
         Router(chat, "small", "large", "learned")
+
+
+def test_final_answer_prefers_the_answer_tag():
+    from llm_router.router import final_answer
+
+    assert final_answer("6000 m/day x 30\nAnswer: 180,000 m (180 km)") == "180000"
+    assert final_answer("Answer: **3** 30-minute episodes") == "3"
+    assert final_answer("answer: $3.50") == "3.5"
+
+
+def test_client_sends_per_model_options():
+    reply = {"choices": [{"message": {"content": "4"}}], "usage": {}}
+    sent = []
+
+    def fake(req, timeout):
+        sent.append(json.loads(req.data))
+        return io.BytesIO(json.dumps(reply).encode())
+
+    with patch("urllib.request.urlopen", side_effect=fake):
+        c = Client("http://x/v1", options={"small": {"reasoning_effort": "none"}})
+        c.chat("small", [])
+        c.chat("large", [])
+    assert sent[0]["reasoning_effort"] == "none" and "reasoning_effort" not in sent[1]
