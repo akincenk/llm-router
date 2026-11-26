@@ -1,0 +1,1615 @@
+{
+  "report": {
+    "small": {
+      "requests": 40,
+      "large_model_share": 0.0,
+      "cache_hits": 0,
+      "escalations": 0,
+      "tokens_small": 17503,
+      "tokens_large": 0,
+      "avg_seconds": 3.12,
+      "accuracy": 0.975,
+      "cost_usd": 0.008
+    },
+    "large": {
+      "requests": 40,
+      "large_model_share": 1.0,
+      "cache_hits": 0,
+      "escalations": 0,
+      "tokens_small": 0,
+      "tokens_large": 7777,
+      "avg_seconds": 2.21,
+      "accuracy": 1.0,
+      "cost_usd": 0.1242
+    },
+    "rules": {
+      "requests": 40,
+      "large_model_share": 0.225,
+      "cache_hits": 0,
+      "escalations": 0,
+      "tokens_small": 10368,
+      "tokens_large": 2838,
+      "avg_seconds": 2.85,
+      "accuracy": 1.0,
+      "cost_usd": 0.0519
+    },
+    "cascade": {
+      "requests": 40,
+      "large_model_share": 0.075,
+      "cache_hits": 0,
+      "escalations": 3,
+      "tokens_small": 24402,
+      "tokens_large": 922,
+      "avg_seconds": 4.85,
+      "accuracy": 0.975,
+      "cost_usd": 0.0263
+    },
+    "with_cache": {
+      "requests": 60,
+      "large_model_share": 0.067,
+      "cache_hits": 14,
+      "escalations": 4,
+      "tokens_small": 27346,
+      "tokens_large": 1219,
+      "avg_seconds": 3.86,
+      "accuracy": 0.983,
+      "cost_usd": 0.0326,
+      "paraphrase_hits": "14/15",
+      "paraphrase_correct": "15/15",
+      "trap_false_hits": "0/5",
+      "trap_correct": "5/5"
+    }
+  },
+  "rows": {
+    "small": [
+      {
+        "q": "What is the capital of Canada?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "How many days are in a leap year?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.9
+      },
+      {
+        "q": "What is the chemical symbol for gold?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "What is 12 times 12?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.6
+      },
+      {
+        "q": "What is the largest planet in the solar system?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "Who wrote Romeo and Juliet?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "What is the boiling point of water at sea level in degrees Celsius?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.9
+      },
+      {
+        "q": "How many minutes are in 3 hours?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "What is the square root of 81?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.1
+      },
+      {
+        "q": "What language is mainly spoken in Brazil?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.3
+      },
+      {
+        "q": "How many sides does a hexagon have?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "What is the freezing point of water in degrees Fahrenheit?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.1
+      },
+      {
+        "q": "What is 15% of 80?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 2.6
+      },
+      {
+        "q": "Which ocean lies between Europe and North America?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.0
+      },
+      {
+        "q": "How many continents are there?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 2.0
+      },
+      {
+        "q": "Which gas do plants absorb from the air for photosynthesis?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 2.0
+      },
+      {
+        "q": "What is the opposite of the word ascend?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.4
+      },
+      {
+        "q": "How many hours are in two days?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.7
+      },
+      {
+        "q": "What is the capital of Japan?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.7
+      },
+      {
+        "q": "What is 1000 divided by 8?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.3
+      },
+      {
+        "q": "A warehouse has 1240 boxes. Each pallet holds 36 boxes. How many full pallets can be built, and how many boxes are left over?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.3
+      },
+      {
+        "q": "A store sold product A at $12 for 45 units, product B at $7.50 for 80 units and product C at $20 for 12 units. What is the total revenue in dollars?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 4.9
+      },
+      {
+        "q": "A train leaves at 9:40 and travels 255 km at 85 km/h without stopping. At what time does it arrive?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.0
+      },
+      {
+        "q": "Inventory starts at 2000 units and drops 15% each month. How many units are left after 3 months, rounded to a whole number?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 6.1
+      },
+      {
+        "q": "A worker packs 14 orders per hour for 7.5 hours, then 9 orders per hour for 2 hours. How many orders in total?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 2.9
+      },
+      {
+        "q": "An item costs $80. It is discounted by 25%, then 10% tax is added to the discounted price. What is the final price in dollars?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.2
+      },
+      {
+        "q": "One picker finishes a route in 30 minutes and another in 45 minutes. Working together on the same route, how many minutes does it take?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 5.1
+      },
+      {
+        "q": "What is the probability of rolling two sixes with two fair dice? Give it as a fraction.",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 2.9
+      },
+      {
+        "q": "What number comes next in the sequence 3, 7, 15, 31?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 5.4
+      },
+      {
+        "q": "A shelf is 240 cm long. Boxes are 30 cm wide and need a 5 cm gap between neighbouring boxes, with no gap at the ends. What is the maximum number of boxes?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 7.5
+      },
+      {
+        "q": "If $1000 earns 5% interest per year, compounded annually, how much is it worth after 3 years? Round to the cent.",
+        "ok": false,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 12.1
+      },
+      {
+        "q": "If 5 machines make 5 widgets in 5 minutes, how many minutes do 100 machines need to make 100 widgets?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 6.4
+      },
+      {
+        "q": "A bat and a ball cost $1.10 together. The bat costs $1.00 more than the ball. How much does the ball cost in dollars?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.9
+      },
+      {
+        "q": "What is the average of 12, 15, 21, 30 and 47?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.8
+      },
+      {
+        "q": "A truck can carry 9000 kg. Two pallets of 1100 kg are already loaded. How many more pallets of 640 kg can it take?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 5.5
+      },
+      {
+        "q": "Convert 72 km/h to metres per second.",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 4.4
+      },
+      {
+        "q": "A clock shows 3:15. What is the angle between the hour and minute hands in degrees?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 8.4
+      },
+      {
+        "q": "One supplier delivers every 6 days and another every 8 days. Both delivered today. In how many days will they both deliver on the same day again?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 4.0
+      },
+      {
+        "q": "A rectangle has a perimeter of 46 m and its length is 5 m more than its width. What is its area in square metres?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 6.4
+      },
+      {
+        "q": "If today is Wednesday, what day of the week will it be 100 days from now?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.1
+      }
+    ],
+    "large": [
+      {
+        "q": "What is the capital of Canada?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 5.2
+      },
+      {
+        "q": "How many days are in a leap year?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 1.5
+      },
+      {
+        "q": "What is the chemical symbol for gold?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "What is 12 times 12?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 0.7
+      },
+      {
+        "q": "What is the largest planet in the solar system?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 0.9
+      },
+      {
+        "q": "Who wrote Romeo and Juliet?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 1.4
+      },
+      {
+        "q": "What is the boiling point of water at sea level in degrees Celsius?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 1.4
+      },
+      {
+        "q": "How many minutes are in 3 hours?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 0.9
+      },
+      {
+        "q": "What is the square root of 81?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 0.9
+      },
+      {
+        "q": "What language is mainly spoken in Brazil?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 1.3
+      },
+      {
+        "q": "How many sides does a hexagon have?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 0.7
+      },
+      {
+        "q": "What is the freezing point of water in degrees Fahrenheit?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 0.7
+      },
+      {
+        "q": "What is 15% of 80?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 0.9
+      },
+      {
+        "q": "Which ocean lies between Europe and North America?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "How many continents are there?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 4.2
+      },
+      {
+        "q": "Which gas do plants absorb from the air for photosynthesis?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 1.9
+      },
+      {
+        "q": "What is the opposite of the word ascend?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 2.2
+      },
+      {
+        "q": "How many hours are in two days?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 1.0
+      },
+      {
+        "q": "What is the capital of Japan?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 0.6
+      },
+      {
+        "q": "What is 1000 divided by 8?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 0.9
+      },
+      {
+        "q": "A warehouse has 1240 boxes. Each pallet holds 36 boxes. How many full pallets can be built, and how many boxes are left over?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 2.2
+      },
+      {
+        "q": "A store sold product A at $12 for 45 units, product B at $7.50 for 80 units and product C at $20 for 12 units. What is the total revenue in dollars?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 2.2
+      },
+      {
+        "q": "A train leaves at 9:40 and travels 255 km at 85 km/h without stopping. At what time does it arrive?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 1.8
+      },
+      {
+        "q": "Inventory starts at 2000 units and drops 15% each month. How many units are left after 3 months, rounded to a whole number?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 3.2
+      },
+      {
+        "q": "A worker packs 14 orders per hour for 7.5 hours, then 9 orders per hour for 2 hours. How many orders in total?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 1.4
+      },
+      {
+        "q": "An item costs $80. It is discounted by 25%, then 10% tax is added to the discounted price. What is the final price in dollars?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 2.8
+      },
+      {
+        "q": "One picker finishes a route in 30 minutes and another in 45 minutes. Working together on the same route, how many minutes does it take?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 3.6
+      },
+      {
+        "q": "What is the probability of rolling two sixes with two fair dice? Give it as a fraction.",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 2.2
+      },
+      {
+        "q": "What number comes next in the sequence 3, 7, 15, 31?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 4.8
+      },
+      {
+        "q": "A shelf is 240 cm long. Boxes are 30 cm wide and need a 5 cm gap between neighbouring boxes, with no gap at the ends. What is the maximum number of boxes?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 5.5
+      },
+      {
+        "q": "If $1000 earns 5% interest per year, compounded annually, how much is it worth after 3 years? Round to the cent.",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 3.1
+      },
+      {
+        "q": "If 5 machines make 5 widgets in 5 minutes, how many minutes do 100 machines need to make 100 widgets?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 4.5
+      },
+      {
+        "q": "A bat and a ball cost $1.10 together. The bat costs $1.00 more than the ball. How much does the ball cost in dollars?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 2.3
+      },
+      {
+        "q": "What is the average of 12, 15, 21, 30 and 47?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 1.7
+      },
+      {
+        "q": "A truck can carry 9000 kg. Two pallets of 1100 kg are already loaded. How many more pallets of 640 kg can it take?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 3.6
+      },
+      {
+        "q": "Convert 72 km/h to metres per second.",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 2.3
+      },
+      {
+        "q": "A clock shows 3:15. What is the angle between the hour and minute hands in degrees?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 4.3
+      },
+      {
+        "q": "One supplier delivers every 6 days and another every 8 days. Both delivered today. In how many days will they both deliver on the same day again?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 1.8
+      },
+      {
+        "q": "A rectangle has a perimeter of 46 m and its length is 5 m more than its width. What is its area in square metres?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 3.1
+      },
+      {
+        "q": "If today is Wednesday, what day of the week will it be 100 days from now?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 3.0
+      }
+    ],
+    "rules": [
+      {
+        "q": "What is the capital of Canada?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.1
+      },
+      {
+        "q": "How many days are in a leap year?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "What is the chemical symbol for gold?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "What is 12 times 12?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.6
+      },
+      {
+        "q": "What is the largest planet in the solar system?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "Who wrote Romeo and Juliet?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.0
+      },
+      {
+        "q": "What is the boiling point of water at sea level in degrees Celsius?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.9
+      },
+      {
+        "q": "How many minutes are in 3 hours?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "What is the square root of 81?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.5
+      },
+      {
+        "q": "What language is mainly spoken in Brazil?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.4
+      },
+      {
+        "q": "How many sides does a hexagon have?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "What is the freezing point of water in degrees Fahrenheit?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.0
+      },
+      {
+        "q": "What is 15% of 80?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 2.1
+      },
+      {
+        "q": "Which ocean lies between Europe and North America?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "How many continents are there?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 2.1
+      },
+      {
+        "q": "Which gas do plants absorb from the air for photosynthesis?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.9
+      },
+      {
+        "q": "What is the opposite of the word ascend?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.4
+      },
+      {
+        "q": "How many hours are in two days?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.8
+      },
+      {
+        "q": "What is the capital of Japan?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.7
+      },
+      {
+        "q": "What is 1000 divided by 8?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.2
+      },
+      {
+        "q": "A warehouse has 1240 boxes. Each pallet holds 36 boxes. How many full pallets can be built, and how many boxes are left over?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 10.2
+      },
+      {
+        "q": "A store sold product A at $12 for 45 units, product B at $7.50 for 80 units and product C at $20 for 12 units. What is the total revenue in dollars?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 3.5
+      },
+      {
+        "q": "A train leaves at 9:40 and travels 255 km at 85 km/h without stopping. At what time does it arrive?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.2
+      },
+      {
+        "q": "Inventory starts at 2000 units and drops 15% each month. How many units are left after 3 months, rounded to a whole number?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 3.3
+      },
+      {
+        "q": "A worker packs 14 orders per hour for 7.5 hours, then 9 orders per hour for 2 hours. How many orders in total?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 2.5
+      },
+      {
+        "q": "An item costs $80. It is discounted by 25%, then 10% tax is added to the discounted price. What is the final price in dollars?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 2.7
+      },
+      {
+        "q": "One picker finishes a route in 30 minutes and another in 45 minutes. Working together on the same route, how many minutes does it take?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 4.9
+      },
+      {
+        "q": "What is the probability of rolling two sixes with two fair dice? Give it as a fraction.",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.5
+      },
+      {
+        "q": "What number comes next in the sequence 3, 7, 15, 31?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 5.7
+      },
+      {
+        "q": "A shelf is 240 cm long. Boxes are 30 cm wide and need a 5 cm gap between neighbouring boxes, with no gap at the ends. What is the maximum number of boxes?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 5.2
+      },
+      {
+        "q": "If $1000 earns 5% interest per year, compounded annually, how much is it worth after 3 years? Round to the cent.",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 2.9
+      },
+      {
+        "q": "If 5 machines make 5 widgets in 5 minutes, how many minutes do 100 machines need to make 100 widgets?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 4.5
+      },
+      {
+        "q": "A bat and a ball cost $1.10 together. The bat costs $1.00 more than the ball. How much does the ball cost in dollars?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 2.8
+      },
+      {
+        "q": "What is the average of 12, 15, 21, 30 and 47?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.8
+      },
+      {
+        "q": "A truck can carry 9000 kg. Two pallets of 1100 kg are already loaded. How many more pallets of 640 kg can it take?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 3.5
+      },
+      {
+        "q": "Convert 72 km/h to metres per second.",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 4.6
+      },
+      {
+        "q": "A clock shows 3:15. What is the angle between the hour and minute hands in degrees?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 7.8
+      },
+      {
+        "q": "One supplier delivers every 6 days and another every 8 days. Both delivered today. In how many days will they both deliver on the same day again?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": false,
+        "s": 1.9
+      },
+      {
+        "q": "A rectangle has a perimeter of 46 m and its length is 5 m more than its width. What is its area in square metres?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 10.0
+      },
+      {
+        "q": "If today is Wednesday, what day of the week will it be 100 days from now?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.3
+      }
+    ],
+    "cascade": [
+      {
+        "q": "What is the capital of Canada?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.6
+      },
+      {
+        "q": "How many days are in a leap year?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.3
+      },
+      {
+        "q": "What is the chemical symbol for gold?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.2
+      },
+      {
+        "q": "What is 12 times 12?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.6
+      },
+      {
+        "q": "What is the largest planet in the solar system?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.1
+      },
+      {
+        "q": "Who wrote Romeo and Juliet?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.2
+      },
+      {
+        "q": "What is the boiling point of water at sea level in degrees Celsius?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.2
+      },
+      {
+        "q": "How many minutes are in 3 hours?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.7
+      },
+      {
+        "q": "What is the square root of 81?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.6
+      },
+      {
+        "q": "What language is mainly spoken in Brazil?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.5
+      },
+      {
+        "q": "How many sides does a hexagon have?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.6
+      },
+      {
+        "q": "What is the freezing point of water in degrees Fahrenheit?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.2
+      },
+      {
+        "q": "What is 15% of 80?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.8
+      },
+      {
+        "q": "Which ocean lies between Europe and North America?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.5
+      },
+      {
+        "q": "How many continents are there?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.3
+      },
+      {
+        "q": "Which gas do plants absorb from the air for photosynthesis?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.7
+      },
+      {
+        "q": "What is the opposite of the word ascend?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.3
+      },
+      {
+        "q": "How many hours are in two days?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.6
+      },
+      {
+        "q": "What is the capital of Japan?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.5
+      },
+      {
+        "q": "What is 1000 divided by 8?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.8
+      },
+      {
+        "q": "A warehouse has 1240 boxes. Each pallet holds 36 boxes. How many full pallets can be built, and how many boxes are left over?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.0
+      },
+      {
+        "q": "A store sold product A at $12 for 45 units, product B at $7.50 for 80 units and product C at $20 for 12 units. What is the total revenue in dollars?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": true,
+        "s": 25.3
+      },
+      {
+        "q": "A train leaves at 9:40 and travels 255 km at 85 km/h without stopping. At what time does it arrive?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.0
+      },
+      {
+        "q": "Inventory starts at 2000 units and drops 15% each month. How many units are left after 3 months, rounded to a whole number?",
+        "ok": false,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 16.0
+      },
+      {
+        "q": "A worker packs 14 orders per hour for 7.5 hours, then 9 orders per hour for 2 hours. How many orders in total?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": true,
+        "s": 18.2
+      },
+      {
+        "q": "An item costs $80. It is discounted by 25%, then 10% tax is added to the discounted price. What is the final price in dollars?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 4.3
+      },
+      {
+        "q": "One picker finishes a route in 30 minutes and another in 45 minutes. Working together on the same route, how many minutes does it take?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 5.9
+      },
+      {
+        "q": "What is the probability of rolling two sixes with two fair dice? Give it as a fraction.",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 2.7
+      },
+      {
+        "q": "What number comes next in the sequence 3, 7, 15, 31?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 5.7
+      },
+      {
+        "q": "A shelf is 240 cm long. Boxes are 30 cm wide and need a 5 cm gap between neighbouring boxes, with no gap at the ends. What is the maximum number of boxes?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 8.4
+      },
+      {
+        "q": "If $1000 earns 5% interest per year, compounded annually, how much is it worth after 3 years? Round to the cent.",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": true,
+        "s": 24.4
+      },
+      {
+        "q": "If 5 machines make 5 widgets in 5 minutes, how many minutes do 100 machines need to make 100 widgets?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 4.0
+      },
+      {
+        "q": "A bat and a ball cost $1.10 together. The bat costs $1.00 more than the ball. How much does the ball cost in dollars?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.0
+      },
+      {
+        "q": "What is the average of 12, 15, 21, 30 and 47?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.4
+      },
+      {
+        "q": "A truck can carry 9000 kg. Two pallets of 1100 kg are already loaded. How many more pallets of 640 kg can it take?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 10.3
+      },
+      {
+        "q": "Convert 72 km/h to metres per second.",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 4.0
+      },
+      {
+        "q": "A clock shows 3:15. What is the angle between the hour and minute hands in degrees?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 12.4
+      },
+      {
+        "q": "One supplier delivers every 6 days and another every 8 days. Both delivered today. In how many days will they both deliver on the same day again?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.6
+      },
+      {
+        "q": "A rectangle has a perimeter of 46 m and its length is 5 m more than its width. What is its area in square metres?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 5.8
+      },
+      {
+        "q": "If today is Wednesday, what day of the week will it be 100 days from now?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 4.0
+      }
+    ],
+    "with_cache": [
+      {
+        "q": "What is the capital of Canada?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.6
+      },
+      {
+        "q": "How many days are in a leap year?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.3
+      },
+      {
+        "q": "What is the chemical symbol for gold?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.2
+      },
+      {
+        "q": "What is 12 times 12?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.5
+      },
+      {
+        "q": "What is the largest planet in the solar system?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.0
+      },
+      {
+        "q": "Who wrote Romeo and Juliet?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.3
+      },
+      {
+        "q": "What is the boiling point of water at sea level in degrees Celsius?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.1
+      },
+      {
+        "q": "How many minutes are in 3 hours?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.6
+      },
+      {
+        "q": "What is the square root of 81?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.7
+      },
+      {
+        "q": "What language is mainly spoken in Brazil?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.0
+      },
+      {
+        "q": "How many sides does a hexagon have?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.7
+      },
+      {
+        "q": "What is the freezing point of water in degrees Fahrenheit?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.2
+      },
+      {
+        "q": "What is 15% of 80?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.7
+      },
+      {
+        "q": "Which ocean lies between Europe and North America?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.5
+      },
+      {
+        "q": "How many continents are there?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.3
+      },
+      {
+        "q": "Which gas do plants absorb from the air for photosynthesis?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.7
+      },
+      {
+        "q": "What is the opposite of the word ascend?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.9
+      },
+      {
+        "q": "How many hours are in two days?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.5
+      },
+      {
+        "q": "What is the capital of Japan?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 0.5
+      },
+      {
+        "q": "What is 1000 divided by 8?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.9
+      },
+      {
+        "q": "A warehouse has 1240 boxes. Each pallet holds 36 boxes. How many full pallets can be built, and how many boxes are left over?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 2.5
+      },
+      {
+        "q": "A store sold product A at $12 for 45 units, product B at $7.50 for 80 units and product C at $20 for 12 units. What is the total revenue in dollars?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": true,
+        "s": 27.4
+      },
+      {
+        "q": "A train leaves at 9:40 and travels 255 km at 85 km/h without stopping. At what time does it arrive?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.2
+      },
+      {
+        "q": "Inventory starts at 2000 units and drops 15% each month. How many units are left after 3 months, rounded to a whole number?",
+        "ok": false,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 17.6
+      },
+      {
+        "q": "A worker packs 14 orders per hour for 7.5 hours, then 9 orders per hour for 2 hours. How many orders in total?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": true,
+        "s": 19.6
+      },
+      {
+        "q": "An item costs $80. It is discounted by 25%, then 10% tax is added to the discounted price. What is the final price in dollars?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 4.9
+      },
+      {
+        "q": "One picker finishes a route in 30 minutes and another in 45 minutes. Working together on the same route, how many minutes does it take?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 5.1
+      },
+      {
+        "q": "What is the probability of rolling two sixes with two fair dice? Give it as a fraction.",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 2.7
+      },
+      {
+        "q": "What number comes next in the sequence 3, 7, 15, 31?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 6.6
+      },
+      {
+        "q": "A shelf is 240 cm long. Boxes are 30 cm wide and need a 5 cm gap between neighbouring boxes, with no gap at the ends. What is the maximum number of boxes?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 8.6
+      },
+      {
+        "q": "If $1000 earns 5% interest per year, compounded annually, how much is it worth after 3 years? Round to the cent.",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": true,
+        "s": 27.0
+      },
+      {
+        "q": "If 5 machines make 5 widgets in 5 minutes, how many minutes do 100 machines need to make 100 widgets?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 4.8
+      },
+      {
+        "q": "A bat and a ball cost $1.10 together. The bat costs $1.00 more than the ball. How much does the ball cost in dollars?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.0
+      },
+      {
+        "q": "What is the average of 12, 15, 21, 30 and 47?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.4
+      },
+      {
+        "q": "A truck can carry 9000 kg. Two pallets of 1100 kg are already loaded. How many more pallets of 640 kg can it take?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 5.7
+      },
+      {
+        "q": "Convert 72 km/h to metres per second.",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 4.4
+      },
+      {
+        "q": "A clock shows 3:15. What is the angle between the hour and minute hands in degrees?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 9.4
+      },
+      {
+        "q": "One supplier delivers every 6 days and another every 8 days. Both delivered today. In how many days will they both deliver on the same day again?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.6
+      },
+      {
+        "q": "A rectangle has a perimeter of 46 m and its length is 5 m more than its width. What is its area in square metres?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 6.5
+      },
+      {
+        "q": "If today is Wednesday, what day of the week will it be 100 days from now?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 3.4
+      },
+      {
+        "q": "Which city is Canada's capital?",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "Tell me the capital city of Japan.",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "What's the chemical symbol of gold?",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "How many sides are on a hexagon?",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "Who is the author of Romeo and Juliet?",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "What is the biggest planet in our solar system?",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "At sea level, at what temperature in Celsius does water boil?",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "How many minutes are there in 3 hours?",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "What do you get when you divide 1000 by 8?",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "What is 15 percent of 80?",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "If inventory falls by 15% a month from 2000 units, what is left after 3 months, rounded?",
+        "ok": true,
+        "model": "qwen3.8:27b",
+        "escalated": true,
+        "s": 24.7
+      },
+      {
+        "q": "With two fair dice, what is the chance of rolling a double six, as a fraction?",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "What number follows 3, 7, 15, 31 in this sequence?",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "Find the area in square metres of a rectangle whose perimeter is 46 m and whose length is 5 m longer than its width.",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "Starting on a Wednesday, which weekday is it 100 days later?",
+        "ok": true,
+        "model": "cache",
+        "escalated": false,
+        "s": 0.0
+      },
+      {
+        "q": "What is 15% of 90?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 2.1
+      },
+      {
+        "q": "How many minutes are in 4 hours?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.1
+      },
+      {
+        "q": "What is 1000 divided by 4?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 1.1
+      },
+      {
+        "q": "If today is Wednesday, what day of the week will it be 101 days from now?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 5.2
+      },
+      {
+        "q": "A truck can carry 9000 kg. Two pallets of 1100 kg are already loaded. How many more pallets of 600 kg can it take?",
+        "ok": true,
+        "model": "gemma4:12b",
+        "escalated": false,
+        "s": 5.2
+      }
+    ]
+  }
+}
