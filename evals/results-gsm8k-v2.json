@@ -1,0 +1,134 @@
+{
+  "models": {
+    "small": "gemma4:12b",
+    "large": "qwen3.8:27b",
+    "embed": "embeddinggemma2-bf16",
+    "options": {
+      "gemma4:12b": {
+        "reasoning_effort": "none"
+      }
+    }
+  },
+  "data": "train: GSM8K train file; test: GSM8K-Platinum",
+  "n_train": 500,
+  "n_test": 1209,
+  "threshold": 0.93,
+  "l2": 1000.0,
+  "small": {
+    "accuracy": 0.9826,
+    "large_share": 0.0,
+    "usd_per_million": 96.16
+  },
+  "large": {
+    "accuracy": 0.9934,
+    "large_share": 1.0,
+    "usd_per_million": 5444.57
+  },
+  "fallback": {
+    "accuracy": 0.9826,
+    "large_share": 0.0,
+    "usd_per_million": 96.16
+  },
+  "rules": {
+    "accuracy": 0.9934,
+    "large_share": 0.952,
+    "usd_per_million": 5278.43
+  },
+  "cascade": {
+    "accuracy": 0.9818,
+    "large_share": 0.0,
+    "usd_per_million": 96.34
+  },
+  "consistency": {
+    "accuracy": 0.9892,
+    "large_share": 0.0223,
+    "usd_per_million": 403.94
+  },
+  "consistency3": {
+    "accuracy": 0.9909,
+    "large_share": 0.0256,
+    "usd_per_million": 527.74
+  },
+  "majority3": {
+    "accuracy": 0.9818,
+    "large_share": 0.0,
+    "usd_per_million": 289.08
+  },
+  "learned_consistency": {
+    "accuracy": 0.9892,
+    "large_share": 0.0223,
+    "usd_per_million": 403.94,
+    "threshold": 0.01
+  },
+  "learned": {
+    "accuracy": 0.9835,
+    "large_share": 0.1481,
+    "usd_per_million": 956.95
+  },
+  "learned_sweep": {
+    "0.5": {
+      "accuracy": 0.9826,
+      "large_share": 0.0,
+      "usd_per_million": 96.16
+    },
+    "0.6": {
+      "accuracy": 0.9826,
+      "large_share": 0.0,
+      "usd_per_million": 96.16
+    },
+    "0.7": {
+      "accuracy": 0.9826,
+      "large_share": 0.0,
+      "usd_per_million": 96.16
+    },
+    "0.8": {
+      "accuracy": 0.9826,
+      "large_share": 0.0,
+      "usd_per_million": 96.16
+    },
+    "0.9": {
+      "accuracy": 0.9826,
+      "large_share": 0.0041,
+      "usd_per_million": 119.59
+    }
+  },
+  "random_same_share": {
+    "accuracy": 0.9842,
+    "large_share": 0.1481,
+    "usd_per_million": 888.26
+  },
+  "oracle": {
+    "accuracy": 0.9975,
+    "large_share": 0.0174,
+    "usd_per_million": 269.0
+  },
+  "signals": {
+    "auroc": {
+      "question_only/rules_signal_count": {
+        "small_wrong": 0.5425,
+        "escalation_helps": 0.5038
+      },
+      "question_only/learned_1_minus_p": {
+        "small_wrong": 0.4885,
+        "escalation_helps": 0.5146
+      },
+      "live/disagree_2_samples": {
+        "small_wrong": 0.6825,
+        "escalation_helps": 0.7142
+      },
+      "live/cascade_escalate": {
+        "small_wrong": 0.5,
+        "escalation_helps": 0.5
+      },
+      "live/disagreement_of_3": {
+        "small_wrong": 0.7293,
+        "escalation_helps": 0.769
+      }
+    },
+    "headroom_oracle_minus_large": 0.0041,
+    "positives": {
+      "small_wrong": 21,
+      "escalation_helps": 18
+    }
+  }
+}

@@ -6,7 +6,9 @@ Send each question to the cheapest model that can answer it, and skip the model 
 
 On a 40-question test set, routing by explainable rules kept the accuracy of always using the large model (**100%**) at **58% lower cost**. A semantic cache in front answered **14 of 15** reworded questions without calling any model and was **never fooled by changed numbers (0 of 5)**.
 
-On 250 held-out problems of the public **GSM8K** maths benchmark, **self-consistency routing matched the large model's accuracy (96.4%) at 51% lower cost**, and sending only the small model's empty replies to the large model reached 95.6% at 58% lower cost. A correction found on re-analysis (2026-11-26): the learned router's result in the first version of this section came almost entirely from that empty-reply fallback, not from learning (details below).
+On the cleaned **GSM8K-Platinum** maths benchmark (1,209 problems, 2026-11-27), with the small model's thinking turned off, **three-sample self-consistency reached 99.1% against the large model's 99.3% at 90% lower cost**, sending 2.6% of problems to the large model. The learned router was no better than a random router at the same share, and question-only signals predicted nothing (AUROC about 0.5), so the routing decision that works is the small model disagreeing with itself.
+
+History: on 2026-11-26 (GSM8K v1, 250 problems, small model thinking on) consistency matched the large model's 96.4% at 51% lower cost; a re-analysis found that the learned router's result there came from the empty-reply fallback, not from learning. Both versions are below.
 
 ## How it works
 
@@ -15,7 +17,7 @@ On 250 held-out problems of the public **GSM8K** maths benchmark, **self-consist
 | `rules` strategy | An explainable difficulty score (length, 3+ numbers, reasoning words such as "each", "after", "probability", several questions, code). Two or more signals send the question to the large model; every answer records why. |
 | `cascade` strategy | The small model answers first and may reply `ESCALATE` when unsure; then the large model answers. |
 | `learned` strategy | Logistic regression on the question's embedding, trained on past answers, predicts whether the small model will be right; below a threshold the question goes to the large model. Standard library only (`learned.py`). |
-| `consistency` strategy | The small model answers twice (the second time sampled at temperature 0.8); if the two final answers differ, the large model answers. |
+| `consistency` strategy | The small model answers twice (the second time sampled at temperature 0.8); if the two final answers differ, the large model answers. The GSM8K evaluation also simulates `consistency3` (three answers must all agree), `majority3` (two of three agreeing is enough, never escalates on a 2-1 vote) and `learned_consistency` (the learned router first, the consistency check only on the questions it calls easy). |
 | Fallback | In `rules` and `cascade`, an empty reply from the small model (for example a thinking model that used its whole token budget) also goes to the large model. |
 | `SemanticCache` | Embeds the question and returns a stored answer when cosine similarity is at least 0.9. **Numbers must match exactly**, so "15% of 80" never returns the answer to "15% of 90". Bounded size, optional time-to-live, thread-safe. |
 | Metrics | Per run: large-model share, cache hits, escalations, tokens per model, average seconds and accuracy; the evaluation adds the dollar cost of input and output tokens. |
@@ -69,7 +71,50 @@ What the numbers mean, honestly:
 - The questions are easy enough that both models score 97.5% or better, so this shows the cost saving at equal quality, not which model is smarter. 40 questions are a smoke test; run it on your own traffic before trusting the percentages.
 - A cache repeats whatever answer it stored, including a wrong one, and costs one embedding call per question (not counted above).
 
-### GSM8K: a public benchmark
+### GSM8K v2: GSM8K-Platinum, small model thinking off (2026-11-27)
+
+The first GSM8K run (next section) had two flaws: 58 of 250 small-model answers were empty because Gemma 4 thought until its token budget ran out, and some GSM8K labels are wrong. v2 changes four things:
+
+1. **Thinking off for the small model** (`reasoning_effort: none` through the new per-model `Client(options=...)`). Small-model replies averaged 173 output tokens and 1.7 seconds; none of its 1,709 replies was empty.
+2. **An `Answer:` line**: the system prompt asks for a last line `Answer: <final answer>`, and grading takes the first number after it, so "Answer: 180,000 m (180 km)" reads as 180000, not 180.
+3. **Cleaner data**: training on 500 problems from the GSM8K *train* file, testing on all 1,209 problems of [GSM8K-Platinum](https://github.com/MadryLab/platinum-benchmarks) (MadryLab: GSM8K test problems with label errors fixed and ambiguous problems removed, MIT licence), so test and training never overlap.
+4. **The checklist of [arXiv 2610.07354](https://arxiv.org/abs/2610.07354)** ("Evaluating Escalation Signals for LLM Routing: Targets, Controls, and Five Ways to Fool Yourself", 2026-10-05): a fallback-only control row, question-only signals as a control for every live signal, two targets ("small model wrong" and "escalating helps": small wrong and large right), the headroom left above the large model, and live sampling counted in the cost. The learned router's L2 strength is picked by cross-validation and its threshold on out-of-fold predictions, both on the training set only.
+
+Same models and prices as above, Ollama 0.40.18, one run (2026-11-26 22:37 to 2026-11-27 05:55, times as logged). Report: [`evals/results-gsm8k-v2.json`](evals/results-gsm8k-v2.json); trained router: [`evals/gsm8k-v2-router.json`](evals/gsm8k-v2-router.json). Re-running the analysis from the stored replies gave a byte-identical report.
+
+| Strategy (1,209 test problems) | Accuracy | Correct | Sent to large model | Per million questions |
+| --- | --- | --- | --- | --- |
+| Always large | 99.34% | 1,201 | 100% | $5,445 |
+| Always small | 98.26% | 1,188 | 0% | $96 (−98%) |
+| Empty-reply fallback only (control) | 98.26% | 1,188 | 0% | $96 (−98%) |
+| Rules | 99.34% | 1,201 | 95.2% | $5,278 (−3%) |
+| Cascade | 98.18% | 1,187 | 0% | $96 (−98%) |
+| Consistency (2 samples) | 98.92% | 1,196 | 2.2% | $404 (−93%) |
+| **Consistency3 (3 samples must agree)** | **99.09%** | **1,198** | **2.6%** | **$528 (−90%)** |
+| Majority3 (2 of 3 is enough) | 98.18% | 1,187 | 0% | $289 (−95%) |
+| Learned | 98.35% | 1,189 | 14.8% | $957 (−82%) |
+| Learned + consistency | 98.92% | 1,196 | 2.2% | $404 (−93%) |
+| Random router, same share as learned | 98.42% | | 14.8% | $888 |
+| Oracle (knows which model is right) | 99.75% | 1,206 | 1.7% | $269 (−95%) |
+
+| Signal: AUROC for… (1,209 test problems; 21 small-model errors, 18 where escalating helps) | small model wrong | escalating helps |
+| --- | --- | --- |
+| Question only: rules signal count (control) | 0.54 | 0.50 |
+| Question only: learned 1 − p(correct) (control) | 0.49 | 0.51 |
+| Live: the 2 small-model samples disagree | 0.68 | 0.71 |
+| Live: disagreement among 3 samples | 0.73 | 0.77 |
+| Live: cascade `ESCALATE` | 0.50 | 0.50 |
+
+What the numbers mean, honestly:
+
+- **Turning thinking off fixed the small model, not the router.** Gemma 4 went from 74.8% (v1, many empty replies) to 98.26% here, only 13 problems behind the large model. That leaves almost no room: the oracle is just 0.41 points above always using the large model (the paper's "headroom" check).
+- **Consistency3 is the best trade-off**: 3 problems fewer than the large model (1,198 against 1,201) for a tenth of the price. Disagreement among the small model's own samples is the only signal that beats the question-only controls (0.73 / 0.77 against about 0.5).
+- **The learned router did not learn.** Its question-only probability scores AUROC 0.49, and it is slightly *worse* than a random router at the same 14.8% share (98.35% against 98.42%). The fallback control shows the fallback did nothing this time (0 empty replies), so v1's correction holds: the earlier learned result came from the fallback.
+- **The cascade never escalated** (0 of 1,209): without thinking, the small model never says it is unsure. **Majority3 never escalated either**, because 2-1 votes are accepted; it adds sampling cost for no accuracy.
+- **Rules get the top accuracy only by sending 95% of problems to the large model** (−3% cost), as in v1: every GSM8K problem looks hard to them.
+- Platinum's cleaner labels and the thinking switch both raise accuracy, so v2 numbers are not comparable with v1's; v1 is kept below as history. With 1,209 problems, differences of 3 or 4 problems (0.25 to 0.33 points) are within noise. One run, one seed. The stored replies (22 MB) are not in the repository; the command `python -m evals.gsm8k --train 500 --cache evals/gsm8k-v2-replies.json` re-creates them (this run took about 7 hours 20 minutes on a Mac Studio).
+
+### GSM8K v1 (2026-11-26, history)
 
 The 40 questions above are mine, so a router could be tuned to them by accident. `python -m evals.gsm8k --n 500` uses problems I did not write: 500 grade-school maths word problems sampled with a fixed seed from the [GSM8K](https://github.com/openai/grade-school-math) test set (MIT licence). The first 250 train the learned router and pick its threshold; every number below is on the other 250. Each problem was asked once to each model (plus the cascade prompt and one sampled reply), every reply stored, and each strategy simulated from the stored replies. Same models and prices as above, 2026-11-26. Report: [`evals/results-gsm8k.json`](evals/results-gsm8k.json); trained router: [`evals/gsm8k-router.json`](evals/gsm8k-router.json).
 
@@ -96,7 +141,7 @@ What the numbers mean, honestly:
 
 ## Tests
 
-`pytest` runs 26 tests with a fake model and a fake embedding, so routing, escalation, the empty-reply fallback, cache hits, the number guard, size limit and time-to-live, metrics, cost and grading are checked without a network or a GPU.
+`pytest` runs 32 tests with a fake model and a fake embedding, so routing, escalation, the empty-reply fallback, cache hits, the number guard, size limit and time-to-live, metrics, cost, grading (including the `Answer:` line), the three-sample strategies, the fallback control and AUROC are checked without a network or a GPU.
 
 ```
 src/llm_router/

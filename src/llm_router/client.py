@@ -16,8 +16,10 @@ class Completion:
 
 
 class Client:
-    def __init__(self, base_url: str, api_key: str = "local", timeout: float = 300):
+    def __init__(self, base_url: str, api_key: str = "local", timeout: float = 300, options: dict | None = None):
+        """options: extra request fields per model, e.g. {"gemma4:12b": {"reasoning_effort": "none"}}."""
         self.base, self.key, self.timeout = base_url.rstrip("/"), api_key, timeout
+        self.options = options or {}
 
     def _post(self, path: str, body: dict) -> dict:
         req = urllib.request.Request(
@@ -32,6 +34,7 @@ class Client:
     def chat(self, model: str, messages: list[dict], max_tokens: int = 2048, temperature: float = 0) -> Completion:
         start = time.monotonic()
         body = {"model": model, "messages": messages, "temperature": temperature, "max_tokens": max_tokens}
+        body.update(self.options.get(model, {}))
         data = self._post("/chat/completions", body)
         usage = data.get("usage") or {}
         return Completion(

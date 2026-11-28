@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from llm_router.cache import SemanticCache, numbers
 from llm_router.client import Completion
 
-SYSTEM = "Answer correctly and briefly. Give the final answer in the last line."
+SYSTEM = "Answer correctly and briefly. End with a last line of the form 'Answer: <final answer>'."
 ESCALATE = "ESCALATE"
 STRATEGIES = ("small", "large", "rules", "cascade", "learned", "consistency")
 SAMPLE_TEMPERATURE = 0.8
@@ -64,12 +64,15 @@ def difficulty(question: str) -> tuple[bool, list[str]]:
 
 
 def final_answer(text: str) -> str:
-    """The last number of the last non-empty line (commas removed), else that line in lower case."""
+    """From the last non-empty line (commas removed): the first number after "Answer:" when the line has one
+    (so "Answer: 180,000 m (180 km)" gives 180000), else the last number, else the line in lower case."""
     lines = [line for line in text.splitlines() if line.strip()]
     last = lines[-1].replace(",", "") if lines else ""
-    nums = re.findall(r"-?\d+(?:\.\d+)?", last)
+    tagged = re.split(r"answer\s*[:：]", last, flags=re.IGNORECASE)
+    nums = re.findall(r"-?\d+(?:\.\d+)?", tagged[-1]) if len(tagged) > 1 else []
+    nums = nums[:1] or re.findall(r"-?\d+(?:\.\d+)?", last)[-1:]
     if nums:
-        v = float(nums[-1])
+        v = float(nums[0])
         return str(int(v)) if v.is_integer() else str(v)
     return last.strip().lower()
 
